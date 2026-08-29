@@ -1,0 +1,189 @@
+-- save document
+vim.keymap.set({'n', 'i', 'v'}, "<C-s>", vim.cmd.w, { desc = "Save Buffer", silent = true })
+-- vim.keymap.set("i", "<C-s>", vim.cmd.w, { desc = "Save Buffer", silent = true })
+-- vim.keymap.set("v", "<C-s>", vim.cmd.w, { desc = "Save Buffer", silent = true })
+
+-- save all documents
+-- vim.keymap.set("n", "<C-S-s>", vim.cmd.wall, { silent = true })
+-- vim.keymap.set("i", "<cs-s>", vim.cmd.wall, { silent = true })
+-- vim.keymap.set("v", "<cs-R>", vim.cmd.wall, { silent = true })
+
+-- vim.keymap.set('n', '<leader>mq', ':wa<CR>', { desc = "Save All Buffers", })
+
+-- Delete text
+vim.keymap.set('i', '<C-Del>', "<Esc>lce")
+vim.keymap.set('n', '<C-Del>', "ce")
+-- vim.keymap.set('i', '<C-BS>', "<Esc>cb")
+-- vim.keymap.set('i', '<C-Backspace>', "<Esc><C-w>")
+-- vim.keymap.set('n', '<C><BS>', "cb<Esc>")
+-- vim.keymap.set('n', '<C-backspace>', "<Esc>cb")
+
+-- Graceful quit: close terminal buffers first to prevent exit freeze,
+-- then quit all. Terminal processes (pwsh, lazygit, etc.) can block Neovim's
+-- exit if they're still running.
+local function quit_nvim(force)
+	-- Force-delete all terminal buffers to kill running processes
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buftype == 'terminal' then
+			pcall(vim.api.nvim_buf_delete, buf, { force = true })
+		end
+	end
+	-- Stop all LSP clients to prevent them from blocking shutdown
+	vim.lsp.stop_client(vim.lsp.get_clients(), true)
+	if force then
+		vim.cmd('qa!')
+	else
+		vim.cmd('qa')
+	end
+end
+
+vim.keymap.set({ 'n', 'v' }, '<leader>q', function() quit_nvim(false) end, { desc = 'Quit nvim' })
+vim.keymap.set({ 'n', 't', 'v' }, '<leader>Q', function() quit_nvim(true) end, { desc = 'Quit nvim with Force' })
+
+-- Split navigation and management
+vim.keymap.set('n', '<leader>bb', ':bprev<CR>', { desc = 'Goto Previous Buffer', silent = true })
+vim.keymap.set('n', '<leader>bn', ':bnext<CR>', { desc = 'Goto Next Buffer', silent = true })
+vim.keymap.set('n', '<C-left>', ':bprev<CR>', { desc = 'Goto Previous Buffer', silent = true })
+vim.keymap.set('n', '<C-right>', ':bnext<CR>', { desc = 'Goto Next Buffer', silent = true })
+-- vim.keymap.set('n', '<leader>c', ':bprev<CR>:bdelete #<CR>')
+vim.keymap.set('n', '<leader>bd', ':bprev<CR>:bdelete #<CR>', { desc = 'Close Current Buffer' })
+vim.keymap.set('n', '<leader>bD', "<cmd>:%bd<CR>", { desc = 'Close All Buffers' })
+vim.keymap.set('n', '<leader>bC', "<cmd>%bd|e#|bd#<CR>", { desc = 'Close All Buffers But This' })
+vim.keymap.set('n', '<leader>br', "<cmd>:e!<CR>", { desc = 'Reload Buffer' })
+
+-- Move between splits
+-- vim.keymap.set({ 'n', }, '<C-h>', ':wincmd h<CR>', { desc = 'Goto Left Buffer', silent = true })
+-- vim.keymap.set({ 'n', }, '<C-l>', ':wincmd l<CR>', { desc = 'Goto Right Buffer', silent = true })
+-- vim.keymap.set({ 'n', }, '<C-j>', ':wincmd j<CR>', { desc = 'Goto Below Buffer', silent = true })
+-- vim.keymap.set({ 'n', }, '<C-k>', ':wincmd k<CR>', { desc = 'Goto Above Buffer', silent = true })
+
+-- vim.keymap.set('t', '<C-h>', '[[<Cmd>wincmd h<CR>]]', { desc = 'Goto Left Buffer', silent = true, buffer = 0 })
+-- vim.keymap.set('t', '<C-l>', '[[<Cmd>wincmd l<CR>]]', { desc = 'Goto Right Buffer', silent = true, buffer = 0 })
+-- vim.keymap.set('t', '<C-j>', '[[<Cmd>wincmd j<CR>]]', { desc = 'Goto Below Buffer', silent = true, buffer = 0 })
+-- vim.keymap.set('t', '<C-k>', '[[<Cmd>wincmd k<CR>]]', { desc = 'Goto Above Buffer', silent = true, buffer = 0 })
+
+vim.keymap.set('n', "<S-q>", '<cmd>:q<CR>', { desc = "Close Without Saving" })
+
+-- Reise splits
+-- vim.keymap.set({ 'n', 't' }, '<S-Left>', ':vertical-resize +1<CR>', { silent = true })
+-- vim.keymap.set({ 'n', 't' }, '<S-Right>', ':vertical-resize -1<CR>', { silent = true })
+vim.keymap.set({ 'n', 't' }, '<S-Left>', '<cmd>vertical resize +1<CR>', { silent = true })
+vim.keymap.set({ 'n', 't' }, '<S-Right>', '<cmd>vertical resize -1<CR>', { silent = true })
+vim.keymap.set({ 'n', 't' }, '<C-Up>', ':resize -1<CR>', { silent = true })
+vim.keymap.set({ 'n', 't' }, '<C-Down>', ':resize +1<CR>', { silent = true })
+vim.keymap.set({ 'n' }, '<S-l>', '10zl', { desc = "Scroll To The Right", silent = true })
+vim.keymap.set({ 'n' }, '<S-h>', '10zh', { desc = "Scroll To The Left", silent = true })
+-- Move current line / block with Alt-j/k a la vscode.
+vim.keymap.set('n', "<M-Down>", ":m .+1<CR>==", { silent = true })
+vim.keymap.set('n', "<M-Up>", ":m .-2<CR>==", { silent = true })
+vim.keymap.set('v', "<M-Down>", ":m '>+1<CR>gv=gv", { silent = true })
+vim.keymap.set('v', "<M-Up>", ":m '<-2<CR>gv=gv", { silent = true })
+
+-- Better line / block movement
+-- vim.keymap.set('n', "<A-j>", ":m '>+1<CR>gv-gv", { silent = true })
+-- vim.keymap.set('n', "<A-k>", ":m '<-2<CR>gv-gv", { silent = true })
+
+-- Better indenting in Visual mode
+vim.keymap.set('v', '>', ">gv")
+vim.keymap.set('v', '<', "<gv")
+
+-- vim.keymap.set('i', "<C-k>", 'k')
+
+-- vim.keymap.set('n', '<leader>ps', "<cmd>:w<CR>:so<CR>:Lazy sync<CR>", { desc = "Lazy Sync"})
+-- vim.keymap.set('n', '<leader>ms', "<cmd>:w<CR>:so<CR>")
+vim.keymap.set('i', '<C-c>', '<Esc>')
+
+vim.keymap.set("n", "<leader>fs", vim.cmd.wall, { desc = "Save All Buffers", silent = true })
+vim.keymap.set("v", "<leader>fs", vim.cmd.wall, { desc = "Save All Buffers", silent = true })
+vim.keymap.set('n', '<leader>fa', "gg<S-v>G<CR>", { desc = "Select All File" })
+vim.keymap.set('n', '<leader>fC', '<cmd>:%y+<CR>', { desc = 'Copy All File To OS' })
+-- vim.keymap.set('n', '<C-a>', 'ggVG', { desc = "Select All Lines" })
+-- vim.keymap.set('n', '<leader>fV', 'gg<S-v>G<CR><leader>fv')
+vim.keymap.set('n', '<leader>fv', '"+p', { desc = "Paste from OS" })
+vim.keymap.set('v', '<leader>fv', '"+p', { desc = "Paste from OS" })
+vim.keymap.set('v', '<leader>fc', '"+y', { desc = "Copy to OS" })
+vim.keymap.set('n', '<leader>fh', '<cmd>:nohls<CR>', { desc = "No HLS" })
+vim.keymap.set('v', '<leader>p', "\"_dP", { desc = "Paste without register" })
+vim.keymap.set('i', '<C-p>', '<Esc>pa')
+
+vim.keymap.set('n', '<leader>ms', "<cmd>:w<CR>:so<CR>", { desc = "Shout Out" })
+vim.keymap.set('n', '<leader>mm', "<cmd>:messages<CR>", { desc = "Show messages" })
+vim.keymap.set('n', '<leader>mc', "<cmd>:messages clear<CR>", { desc = "Show messages" })
+
+-- create new lines in Normal mode
+vim.keymap.set('n', '<leader>o', "o<Esc>^Da<Esc>k", { desc = 'Newline Below', silent = true })
+vim.keymap.set('n', '<leader>O', "O<Esc>^Da<Esc>j", { desc = 'Newline Above', silent = true })
+
+vim.keymap.set('i', '<S-tab>', '<esc><<i', { desc = 'Indent Left' })
+
+vim.keymap.set('n', '<S-Home>', 'gg')
+vim.keymap.set('n', '<S-End>', 'G')
+vim.keymap.set('n', '<Home>', '^')
+
+vim.keymap.set('n', '<S-Down>', 'j')
+vim.keymap.set('v', '<S-Down>', 'j')
+vim.keymap.set('n', '<S-Up>', 'k')
+vim.keymap.set('v', '<S-Up>', 'k')
+
+local function toggle_highlight()
+    local line_num = vim.fn.line('.')
+    local highlight_group = 'LineHighlight'
+
+    -- Get all matches
+    local matches = vim.fn.getmatches()
+    local match_id = nil
+
+    -- Check if there's already a match for the current line
+    for _, match in ipairs(matches) do
+        if match.group == highlight_group and match.pattern == '\\%' .. line_num .. 'l' then
+            match_id = match.id
+            break
+        end
+    end
+
+    if match_id then
+        -- Remove the existing match
+        vim.fn.matchdelete(match_id)
+        print('Line highlight removed')
+    else
+        -- Add a new highlight
+        vim.cmd('highlight LineHighlight ctermbg=gray guibg=gray')
+        vim.fn.matchadd('LineHighlight', '\\%' .. line_num .. 'l')
+        print('Line highlighted')
+    end
+end
+-- Set the key mapping
+vim.keymap.set('n', '<leader>ha', toggle_highlight, { desc = 'Toggle Highlight Line' })
+vim.keymap.set('n', '<leader>hr', "<cmd>call clearmatches()<CR>", { desc = 'Toggle Highlight Line' })
+
+vim.keymap.set({'n'}, '<leader>/', 'gcc', { remap = true, desc = 'Comment in Normal Mode' })
+vim.keymap.set({'v'}, '<leader>/', 'gc', { remap = true, desc = 'Comment in Visual Mode' })
+
+-- Diagnostic navigation
+vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev() end, { desc = 'Previous Diagnostic', silent = true })
+vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() end, { desc = 'Next Diagnostic', silent = true })
+
+-- Terminal mode: alternative escape (for TUI apps like OpenCode where <Esc> passes through)
+vim.keymap.set('t', '<C-]>', '<C-\\><C-n>', { desc = 'Exit Terminal Mode', silent = true })
+
+vim.keymap.set("n", "<leader>dr", function()
+	local Terminal = require("toggleterm.terminal").Terminal
+  -- 1. Get relative file path
+  local buf = vim.api.nvim_get_current_buf()
+  local abs_path = vim.api.nvim_buf_get_name(buf)
+  if abs_path == "" then
+    print("No file name for this buffer")
+    return
+  end
+
+  local rel_path = vim.fn.fnamemodify(abs_path, ":.")
+  local cmd = "dotnet run " .. rel_path .. "\n"
+
+  -- 2. Toggle the existing terminal (same behavior as Ctrl+\)
+  -- The default terminal is ID=1
+  local term = Terminal:new({ id = 1 })
+  term:toggle()
+
+  -- 3. Send the command to the terminal
+  term:send(cmd)
+end, { desc = "dotnet run current file in ToggleTerm" })
