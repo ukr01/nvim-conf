@@ -7,7 +7,7 @@ require("lualine").setup({
       {
         "filename",
         symbols = {
-          modified = " ●",  -- dirty buffer
+          modified = " ●", -- dirty buffer
           readonly = " 🔒",
           unnamed = "[No Name]",
         },
@@ -16,4 +16,20 @@ require("lualine").setup({
   },
 })
 
+require("catppuccin").setup({
+  flavour = "mocha", -- Vælg mellem: latte, frappe, macchiato, mocha
+  transparent_background = false,
+  integrations = {
+    cmp = true,
+    gitsigns = true,
+    nvimtree = true,
+    treesitter = true,
+  },
+})
+
+-- Aktivér selve farvetemaet i Neovim
+vim.cmd.colorscheme("catppuccin-nvim")
+
 vim.api.nvim_set_hl(0, "LspCodeLens", { fg = "#717171", italic = true })
+
+vim.opt.clipboard = "unnamedplus"
