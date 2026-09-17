@@ -1,6 +1,7 @@
 return {
   {
     "folke/trouble.nvim",
+    event = "VeryLazy",
     opts = {
       modes = {
         error_list = {
@@ -8,7 +9,9 @@ return {
           source = "diagnostics",
           events = { "DiagnosticChanged", "BufEnter" },
           auto_open = true,
-          auto_close = true,
+          auto_close = false,
+          open_no_results = true,
+          warn_no_results = false,
           auto_preview = false,
           focus = false,
           multiline = false,
@@ -24,7 +27,7 @@ return {
           format = "{severity_icon} {severity}  {code}  {message:md}  {filename} {pos}",
           win = {
             position = "bottom",
-            size = 12,
+            size = 6,
             wo = {
               winfixheight = true,
               wrap = false,
@@ -33,6 +36,13 @@ return {
         },
       },
     },
+    config = function(_, opts)
+      local trouble = require("trouble")
+      trouble.setup(opts)
+      vim.schedule(function()
+        trouble.open({ mode = "error_list", focus = false })
+      end)
+    end,
     keys = {
       {
         "<leader>xe",
