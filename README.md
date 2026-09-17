@@ -64,6 +64,31 @@ This is preferred over restarting the entire LSP after every project-file
 change. Roslyn also runs compiler and analyzer diagnostics across the full
 solution.
 
+### NuGet package browser
+
+Open the NuGet browser with `<leader>cN` or:
+
+```vim
+:NuGet
+```
+
+First select a direct `.csproj`, or select a `.sln`/`.slnx` and then one of its
+C# projects. Package references belong to projects, so solution selection is a
+shortcut for narrowing the project list.
+
+The browser supports:
+
+- **Add**: search configured NuGet sources, select a package, then select an
+  explicit version.
+- **Update**: select an installed top-level package and choose a different
+  version.
+- **Remove**: select and remove an installed top-level package.
+
+Searches honor the `NuGet.Config` hierarchy for the selected project, including
+configured private feeds. Package changes run through the `dotnet` CLI, perform
+restore and compatibility checks, and are picked up by Roslyn's native file
+watcher.
+
 Use the following command when a workspace contains multiple solutions:
 
 ```vim
@@ -120,11 +145,33 @@ Before launching, the configuration:
 
 Select an executable project rather than a class-library project.
 
+### Quick run in an external terminal
+
+Press `<leader>dR` or run `:DotnetRun` to launch:
+
+```sh
+dotnet run --project <selected-project>
+```
+
+The process opens in a new external terminal window. The command first reuses
+the project selected with `<leader>dS`. If no project has been selected, it
+uses the nearest `.csproj` above the current file; otherwise it opens the
+solution/project picker.
+
+The terminal remains open after the application exits so output and errors stay
+visible. On Windows it remains at a PowerShell prompt. On Linux it displays the
+exit code and waits for Enter before closing.
+
+On Windows this uses Windows Terminal (`wt.exe`). On CachyOS and other Linux
+systems it detects `wezterm`, `kitty`, `alacritty`, `foot`, `footclient`,
+`konsole`, `gnome-terminal`, or `xterm`.
+
 ### Debug keybindings
 
 | Key | Action |
 | --- | --- |
 | `<leader>dS` | Select a solution or C# debug project |
+| `<leader>dR` | Run the selected/nearest project in an external terminal |
 | `F5` | Start or continue debugging |
 | `F10` | Step over |
 | `F11` | Step into |
@@ -300,6 +347,9 @@ Useful commands:
 | [`lua/config/autocmds.lua`](./lua/config/autocmds.lua) | Custom autocommands |
 | [`lsp/roslyn.lua`](./lsp/roslyn.lua) | Roslyn full-solution analysis settings |
 | [`lua/plugins/roslyn.lua`](./lua/plugins/roslyn.lua) | Roslyn plugin and file-watching configuration |
+| [`lua/dotnet-projects.lua`](./lua/dotnet-projects.lua) | Shared solution and project discovery |
+| [`lua/dotnet-runner.lua`](./lua/dotnet-runner.lua) | Cross-platform external terminal runner |
+| [`lua/nuget-browser.lua`](./lua/nuget-browser.lua) | NuGet search, add, update, and removal workflow |
 | [`lua/plugins/debugging.lua`](./lua/plugins/debugging.lua) | .NET project selection and DAP configuration |
 | [`lua/plugins/http.lua`](./lua/plugins/http.lua) | `.http` request execution and response layout |
 | [`lua/plugins/completion.lua`](./lua/plugins/completion.lua) | Completion and documentation-window behavior |
@@ -336,6 +386,17 @@ Wait for `dotnet restore` to complete and confirm Roslyn file watching:
 
 Then use `:LspRestart roslyn` only if the native watcher did not process the
 change.
+
+### NuGet browser search fails
+
+The browser requires a .NET SDK that supports JSON package search:
+
+```sh
+dotnet package search Newtonsoft.Json --format json
+```
+
+Check authenticated feeds and source precedence in the applicable
+`NuGet.Config`. CLI failures are displayed directly in Neovim.
 
 ### Treesitter parser errors
 
