@@ -309,7 +309,9 @@ provided by Roslyn and the referenced package's XML documentation.
 Trouble provides a persistent error list at the bottom of the editor.
 
 - Height: 6 lines
-- Shows errors and warnings
+- Groups errors and warnings by file
+- Shows concise severity icons, messages, diagnostic codes, and positions
+- Uses a compact IDE-style `Problems` header and highlighted active row
 - Opens automatically
 - Remains visible when there are no diagnostics
 - Does not take keyboard focus when opened automatically

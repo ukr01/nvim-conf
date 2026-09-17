@@ -14,6 +14,8 @@ return {
           warn_no_results = false,
           auto_preview = false,
           focus = false,
+          follow = false,
+          indent_guides = false,
           multiline = false,
           filter = function(items)
             if vim.g.dotnet_debugging then
@@ -23,12 +25,23 @@ return {
               return item.severity <= vim.diagnostic.severity.WARN
             end, items)
           end,
-          sort = { "severity", "filename", "pos", "message" },
-          format = "{severity_icon} {severity}  {code}  {message:md}  {filename} {pos}",
+          groups = {
+            { "filename", format = "{file_icon} {basename:Title} {count}" },
+          },
+          sort = { "filename", "severity", "pos", "message" },
+          format = "{severity_icon} {message:md} {code:Comment} {pos}",
           win = {
             position = "bottom",
             size = 6,
             wo = {
+              cursorline = true,
+              foldcolumn = "0",
+              list = false,
+              number = false,
+              relativenumber = false,
+              signcolumn = "no",
+              spell = false,
+              winbar = "  Problems",
               winfixheight = true,
               wrap = false,
             },
