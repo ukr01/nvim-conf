@@ -10,6 +10,15 @@ vim.keymap.set("n", "<leader>cN", function()
   require("nuget-browser").open()
 end, { desc = "NuGet Packages" })
 
+-- Roslyn monitoring controls
+vim.keymap.set("n", "<leader>cR", function()
+  require("roslyn-monitor").toggle()
+end, { desc = "Toggle Roslyn Monitoring" })
+
+vim.keymap.set("n", "<leader>cr", function()
+  require("roslyn-monitor").refresh_buffer(vim.api.nvim_get_current_buf())
+end, { desc = "Refresh Roslyn State" })
+
 vim.api.nvim_create_user_command("NuGet", function()
   require("nuget-browser").open()
 end, { desc = "Manage NuGet packages" })

@@ -6,3 +6,9 @@
 --
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+
+-- Roslyn file monitoring autocmds
+-- These ensure Roslyn updates are reflected when switching buffers or regaining focus
+pcall(function()
+  require("config.roslyn").setup()
+end)
