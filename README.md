@@ -11,7 +11,7 @@ Windows and Linux, including CachyOS.
 - `nvim-dap` debugging through Mason-managed `netcoredbg`
 - Executable `.http` files with environments and formatted response views
 - Readable overload and symbol-documentation popups
-- Persistent, compact error and warning list
+- Persistent error and warning list with severity filtering (errors/warnings/info) and current buffer prioritization
 - Treesitter highlighting through LazyVim's current `main`-branch integration
 
 LazyVim's `<leader>` key is `Space`. For example, `<leader>Rs` means press
@@ -304,20 +304,59 @@ Long C# signatures in the documentation popup are also displayed with one
 parameter per line. Documentation availability depends on the information
 provided by Roslyn and the referenced package's XML documentation.
 
+## Roslyn Monitoring
+
+The configuration includes real-time file change monitoring for Roslyn. When files change externally (e.g., new classes added, files modified by another process), the LSP state is automatically refreshed and a notification appears showing which files were synced.
+
+### Features
+
+- **Automatic updates** when switching buffers or regaining focus
+- **Timestamped notifications** in the command area showing synced files
+- **No visual flash** - uses subtle text notifications instead
+- **Rate-limited** to prevent notification spam
+
+### Controls
+
+| Command/Key | Action |
+| --- | --- |
+| `<leader>cR` | Toggle monitoring on/off |
+| `<leader>cr` | Force refresh current buffer |
+| `:RoslynMonitorToggle` | Toggle monitoring |
+| `:RoslynRefresh` | Refresh current buffer |
+| `:RoslynRefreshAll` | Refresh all C# buffers |
+| `:RoslynMonitorStatus` | Check monitoring status |
+
 ## Diagnostics
 
 Trouble provides a persistent error list at the bottom of the editor.
 
-- Height: 6 lines
+- Height: **8 lines** (increased from 6)
 - Groups errors and warnings by file
-- Shows concise severity icons, messages, diagnostic codes, and positions
+- **Current buffer errors appear at the top** for easy focus
+- **Line numbers displayed at the far left** for quick reference
 - Uses a compact IDE-style `Problems` header and highlighted active row
 - Opens automatically
 - Remains visible when there are no diagnostics
 - Does not take keyboard focus when opened automatically
 - Temporarily hides during debugging
 
-Use `<leader>xe` to toggle it manually.
+### Severity Filtering
+
+Filter the error list to show specific severity levels, similar to Visual Studio:
+
+| Command/Key | Action |
+| --- | --- |
+| `<leader>xe` | Toggle error list |
+| `<leader>xE` | Show **Errors only** |
+| `<leader>xW` | Show **Warnings only** |
+| `<leader>xI` | Show **Info only** |
+| `<leader>xA` | Show **All** (Errors + Warnings) |
+| `:TroubleErrors` | Show errors only |
+| `:TroubleWarnings` | Show warnings only |
+| `:TroubleInfo` | Show info only |
+| `:TroubleAll` | Show all diagnostics |
+
+Use `<leader>xe` to toggle the error list manually.
 
 Inline diagnostic virtual text is disabled. Diagnostics are underlined, and a
 line-level diagnostic popup appears after the cursor remains idle.
@@ -347,7 +386,9 @@ Useful commands:
 | [`lua/config/keymaps.lua`](./lua/config/keymaps.lua) | Custom global keybindings |
 | [`lua/config/options.lua`](./lua/config/options.lua) | Custom Neovim options |
 | [`lua/config/autocmds.lua`](./lua/config/autocmds.lua) | Custom autocommands |
+| [`lua/config/roslyn.lua`](./lua/config/roslyn.lua) | Roslyn monitoring setup and user commands |
 | [`lsp/roslyn.lua`](./lsp/roslyn.lua) | Roslyn full-solution analysis settings |
+| [`lua/roslyn-monitor.lua`](./lua/roslyn-monitor.lua) | Roslyn file change monitor with real-time notifications |
 | [`lua/plugins/roslyn.lua`](./lua/plugins/roslyn.lua) | Roslyn plugin and file-watching configuration |
 | [`lua/dotnet-projects.lua`](./lua/dotnet-projects.lua) | Shared solution and project discovery |
 | [`lua/dotnet-runner.lua`](./lua/dotnet-runner.lua) | Cross-platform external terminal runner |
@@ -356,7 +397,7 @@ Useful commands:
 | [`lua/plugins/http.lua`](./lua/plugins/http.lua) | `.http` request execution and response layout |
 | [`lua/plugins/completion.lua`](./lua/plugins/completion.lua) | Completion and documentation-window behavior |
 | [`lua/overload-picker.lua`](./lua/overload-picker.lua) | Signature-help and hover popup rendering |
-| [`lua/plugins/error-list.lua`](./lua/plugins/error-list.lua) | Persistent Trouble diagnostic window |
+| [`lua/plugins/error-list.lua`](./lua/plugins/error-list.lua) | Persistent Trouble diagnostic window with severity filtering |
 | [`lua/plugins/treesitter.lua`](./lua/plugins/treesitter.lua) | Additional Treesitter parsers |
 
 ## Troubleshooting
